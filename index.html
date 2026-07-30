@@ -5,143 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Password Strength Checker</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --primary: #38bdf8;
-      --error: #f87171;
-      --warning: #fbbf24;
-      --success: #4ade80;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: #ffffff;
+      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
       padding: 20px;
     }
 
     .container {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 32px;
       width: 100%;
-      max-width: 440px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
     }
 
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-      margin-bottom: 24px;
-      text-align: center;
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 28px;
     }
 
     label {
       display: block;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
+      color: #666666;
       margin-bottom: 6px;
-      color: var(--text-muted);
     }
 
     input[type="text"],
     input[type="password"] {
       width: 100%;
-      padding: 10px 14px;
-      background-color: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 1rem;
+      padding: 8px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #000000;
+      color: #000000;
+      font-size: 1.1rem;
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input:focus {
-      border-color: var(--primary);
+      border-radius: 0;
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      background-color: var(--primary);
-      color: #0f172a;
-      font-weight: 600;
+      padding: 12px 0;
+      background-color: #000000;
+      color: #ffffff;
+      font-weight: 500;
       border: none;
-      border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
-      margin-top: 8px;
-      transition: opacity 0.2s;
-    }
-
-    button:hover {
-      opacity: 0.9;
+      margin-top: 12px;
+      border-radius: 0;
     }
 
     button:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
     .result-box {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 6px;
-      font-size: 0.9rem;
+      margin-top: 28px;
+      font-size: 0.95rem;
+      line-height: 1.6;
       display: none;
     }
 
-    .result-box.status-error {
-      background-color: rgba(248, 113, 113, 0.1);
-      border: 1px solid var(--error);
-      color: var(--error);
-    }
-
-    .result-box.status-warning {
-      background-color: rgba(251, 191, 36, 0.1);
-      border: 1px solid var(--warning);
-      color: var(--warning);
-    }
-
-    .result-box.status-success {
-      background-color: rgba(74, 222, 128, 0.1);
-      border: 1px solid var(--success);
-      color: var(--success);
-    }
-
     .result-box h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
       margin-bottom: 8px;
-      font-size: 1rem;
     }
 
     .result-box ul {
       margin-left: 20px;
-      margin-bottom: 12px;
+      margin-top: 6px;
     }
 
     .result-box li {
@@ -152,17 +102,16 @@
 <body>
 
   <div class="container">
-    <h2>Password Checker</h2>
-    <p class="subtitle">Check password strength & breach records</p>
+    <h1>Password Checker</h1>
 
     <div class="form-group">
       <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter username">
+      <input type="text" id="username">
     </div>
 
     <div class="form-group">
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password">
+      <input type="password" id="password">
     </div>
 
     <button id="check-btn" onclick="checkPassword()">Check Password</button>
@@ -272,7 +221,6 @@
       const resultDiv = document.getElementById('result');
 
       if (!password) {
-        resultDiv.className = 'result-box status-error';
         resultDiv.style.display = 'block';
         resultDiv.innerHTML = '<h4>Password rejected</h4><p>Password cannot be empty.</p>';
         return;
@@ -290,20 +238,17 @@
       btn.innerText = 'Check Password';
 
       if (errors.length > 0) {
-        resultDiv.className = 'result-box status-error';
         let html = '<h4>Password rejected</h4><ul>';
         errors.forEach(err => html += `<li>${err}</li>`);
         html += '</ul>';
         resultDiv.innerHTML = html;
       } else if (warnings.length > 0) {
-        resultDiv.className = 'result-box status-warning';
         let html = '<h4>Warnings detected</h4><ul>';
         warnings.forEach(w => html += `<li>${w}</li>`);
         html += '</ul><p>Password acceptable with warnings.</p>';
         resultDiv.innerHTML = html;
       } else {
-        resultDiv.className = 'result-box status-success';
-        resultDiv.innerHTML = '<h4>Password accepted!</h4><p>No errors or warnings found.</p>';
+        resultDiv.innerHTML = '<h4>Password accepted</h4><p>No errors or warnings found.</p>';
       }
 
       resultDiv.style.display = 'block';
