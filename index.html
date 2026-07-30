@@ -247,19 +247,24 @@
       btn.disabled = false;
       btn.innerText = 'Check Password';
 
+      let html = '';
       if (errors.length > 0) {
-        let html = '<h4>Password rejected</h4><ul>';
+        html += '<h4>Password rejected</h4><ul>';
         errors.forEach(err => html += `<li>${err}</li>`);
         html += '</ul>';
-        resultDiv.innerHTML = html;
-      } else if (warnings.length > 0) {
-        let html = '<h4>Warnings detected</h4><ul>';
-        warnings.forEach(w => html += `<li>${w}</li>`);
-        html += '</ul><p>Password acceptable with warnings.</p>';
-        resultDiv.innerHTML = html;
-      } else {
-        resultDiv.innerHTML = '<h4>Password accepted</h4><p>No errors or warnings found.</p>';
       }
+
+      if (warnings.length > 0) {
+        html += '<h4>Warnings</h4><ul>';
+        warnings.forEach(w => html += `<li>${w}</li>`);
+        html += '</ul>';
+      }
+
+      if (errors.length === 0 && warnings.length === 0) {
+        html = '<h4>Password accepted</h4><p>No errors or warnings found.</p>';
+      }
+
+      resultDiv.innerHTML = html;
 
       resultDiv.style.display = 'block';
     }
