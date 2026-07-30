@@ -5,302 +5,166 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Password Strength Checker - Presentation</title>
   <style>
-    :root {
-      --bg: #090d16;
-      --card-bg: #131b2e;
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --error: #f87171;
-      --warning: #fbbf24;
-      --success: #4ade80;
-      --border: #1e293b;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      background-color: #ffffff;
+      color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
     }
 
-    .slide-container {
-      width: 85vw;
-      max-width: 1000px;
-      height: 70vh;
-      max-height: 600px;
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: 80px 100px;
       position: relative;
     }
 
-    .slide {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 48px;
+    .slide.active {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      opacity: 0;
-      transform: translateX(50px);
-      pointer-events: none;
-      transition: all 0.4s ease;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
     }
 
-    .slide.active {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;
+    .page-number {
+      position: absolute;
+      top: 40px;
+      right: 50px;
+      font-size: 1rem;
+      color: #000000;
     }
 
     h1 {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 3.5rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
     }
 
     h2 {
-      font-size: 2rem;
-      margin-bottom: 24px;
-      color: var(--accent);
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 40px;
+      letter-spacing: -0.5px;
     }
 
-    p.subtitle {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      margin-bottom: 32px;
+    p {
+      font-size: 1.5rem;
+      line-height: 1.6;
+      color: #333333;
+      max-width: 800px;
     }
 
     ul {
-      list-style: none;
-      font-size: 1.1rem;
+      list-style-type: square;
+      margin-left: 24px;
+    }
+
+    li {
+      font-size: 1.4rem;
       line-height: 1.8;
-    }
-
-    ul li {
+      color: #000000;
       margin-bottom: 16px;
-      display: flex;
-      align-items: flex-start;
-      color: var(--text);
     }
 
-    ul li::before {
-      content: "•";
-      color: var(--accent);
-      font-weight: bold;
-      font-size: 1.5rem;
-      margin-right: 12px;
-      line-height: 1;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .card {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--border);
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 12px;
-    }
-
-    .card.error-card {
-      border-color: rgba(248, 113, 113, 0.3);
-    }
-    .card.error-card h3 { color: var(--error); }
-
-    .card.warning-card {
-      border-color: rgba(251, 191, 36, 0.3);
-    }
-    .card.warning-card h3 { color: var(--warning); }
-
-    .code-block {
-      background: #090d16;
-      border: 1px solid var(--border);
-      padding: 16px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 0.95rem;
-      color: var(--accent);
-      margin-top: 12px;
-    }
-
-    /* Controls */
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-top: 24px;
-    }
-
-    button.nav-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    button.nav-btn:hover {
-      background: var(--accent-glow);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .slide-counter {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      background: var(--accent-glow);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+    .subtitle {
+      font-size: 1.6rem;
+      color: #555555;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="slide-container">
-    
-    <!-- Slide 1: Title -->
-    <div class="slide active">
-      <span class="badge">Project Presentation</span>
-      <h1>Password Strength Checker</h1>
-      <p class="subtitle">A privacy-focused password evaluation tool powered by k-Anonymity & security heuristics.</p>
-    </div>
-
-    <!-- Slide 2: Problem & Solution -->
-    <div class="slide">
-      <h2>Problem & Solution</h2>
-      <ul>
-        <li><strong>Problem:</strong> Users choose weak, predictable, or already leaked passwords without knowing the risk.</li>
-        <li><strong>Privacy Concern:</strong> Checking passwords online using traditional APIs requires sending plain text passwords over network calls.</li>
-        <li><strong>Our Solution:</strong> A hybrid local heuristic analyzer combined with zero-knowledge breach checking via HaveIBeenPwned API (k-Anonymity).</li>
-      </ul>
-    </div>
-
-    <!-- Slide 3: Core Evaluation Rules -->
-    <div class="slide">
-      <h2>Evaluation Architecture</h2>
-      <div class="grid-2">
-        <div class="card error-card">
-          <h3>Immediate Rejections</h3>
-          <ul>
-            <li>Username contained in password</li>
-            <li>Leaked in > 300 data breaches</li>
-            <li>Empty password input</li>
-          </ul>
-        </div>
-        <div class="card warning-card">
-          <h3>Interactive Warnings</h3>
-          <ul>
-            <li>Leaked in 1-300 data breaches</li>
-            <li>Fewer than 4 numeric digits</li>
-            <li>Missing uppercase / special chars</li>
-            <li>Potential birth year (1970–2015)</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Slide 4: Privacy via k-Anonymity -->
-    <div class="slide">
-      <h2>Privacy Protection: k-Anonymity</h2>
-      <ul>
-        <li><strong>SHA-1 Local Hashing:</strong> Password is hashed on the user device.</li>
-        <li><strong>5-Character Prefix:</strong> Only first 5 characters of SHA-1 hash sent to <code>api.pwnedpasswords.com</code>.</li>
-        <li><strong>Local Suffix Matching:</strong> Remote server returns matching hash pool; local script compares the remaining 35 characters.</li>
-      </ul>
-      <div class="code-block">
-        Password -> SHA-1 Hash -> Prefix (5 chars to API) + Suffix (35 chars checked locally)
-      </div>
-    </div>
-
-    <!-- Slide 5: Cross-Platform Deployment -->
-    <div class="slide">
-      <h2>Implementations & Deployment</h2>
-      <ul>
-        <li><strong>CLI Version (Python):</strong> Standalone terminal script utilizing standard Python libraries.</li>
-        <li><strong>Web Version (HTML/JS):</strong> Client-side web application built with Web Crypto API (`crypto.subtle`).</li>
-        <li><strong>GitHub Pages Deployment:</strong> Hosted directly on GitHub Pages for public availability.</li>
-      </ul>
-    </div>
-
+  <!-- Slide 1 -->
+  <div class="slide active">
+    <div class="page-number">1 / 5</div>
+    <h1>Password Strength Checker</h1>
+    <p class="subtitle">A privacy-focused password evaluation tool using k-anonymity.</p>
   </div>
 
-  <div class="controls">
-    <button class="nav-btn" onclick="prevSlide()">Previous</button>
-    <span class="slide-counter" id="counter">Slide 1 of 5</span>
-    <button class="nav-btn" onclick="nextSlide()">Next</button>
+  <!-- Slide 2 -->
+  <div class="slide">
+    <div class="page-number">2 / 5</div>
+    <h2>Problem & Solution</h2>
+    <ul>
+      <li>Users rely on weak passwords or exposed credentials.</li>
+      <li>Checking passwords online risks privacy leaks.</li>
+      <li>Our tool checks passwords locally and uses k-anonymity for breach verification.</li>
+    </ul>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide">
+    <div class="page-number">3 / 5</div>
+    <h2>Evaluation Rules</h2>
+    <ul>
+      <li><strong>Errors (Rejected):</strong> Username inclusion, empty input, >300 breaches.</li>
+      <li><strong>Warnings (Interactive):</strong> 1–300 breaches, &lt;4 digits, missing uppercase/special chars, birth year (1970–2015).</li>
+    </ul>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide">
+    <div class="page-number">4 / 5</div>
+    <h2>k-Anonymity Privacy</h2>
+    <ul>
+      <li>Local SHA-1 hashing of password.</li>
+      <li>Only first 5 characters sent to HaveIBeenPwned API.</li>
+      <li>Remaining 35 characters matched locally on device.</li>
+    </ul>
+  </div>
+
+  <!-- Slide 5 -->
+  <div class="slide">
+    <div class="page-number">5 / 5</div>
+    <h2>Deployment</h2>
+    <ul>
+      <li><strong>Python CLI:</strong> Terminal execution via standard library.</li>
+      <li><strong>Web App:</strong> Pure HTML & JS interface.</li>
+      <li><strong>Hosted:</strong> Deployed on GitHub Pages.</li>
+    </ul>
   </div>
 
   <script>
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
-    const counter = document.getElementById('counter');
 
-    function updateSlide() {
-      slides.forEach((slide, index) => {
-        slide.classList.toggle('active', index === currentSlide);
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
       });
-      counter.innerText = `Slide ${currentSlide + 1} of ${slides.length}`;
-    }
-
-    function nextSlide() {
-      if (currentSlide < slides.length - 1) {
-        currentSlide++;
-        updateSlide();
-      }
-    }
-
-    function prevSlide() {
-      if (currentSlide > 0) {
-        currentSlide--;
-        updateSlide();
-      }
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
-      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        if (currentSlide < slides.length - 1) {
+          currentSlide++;
+          showSlide(currentSlide);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (currentSlide > 0) {
+          currentSlide--;
+          showSlide(currentSlide);
+        }
+      }
+    });
+
+    document.addEventListener('click', () => {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+      } else {
+        currentSlide = 0;
+      }
+      showSlide(currentSlide);
     });
   </script>
 </body>
