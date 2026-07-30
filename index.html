@@ -210,41 +210,15 @@
         warnings.push("No special character");
       }
 
-      // Birth year check (1970 - 2015)
-      let hasBirthYear = false;
-      const n = password.length;
-      let i = 0;
-
-      while (i < n) {
-        if (/\d/.test(password[i])) {
-          const start = i;
-          while (i < n && /\d/.test(password[i])) {
-            i++;
-          }
-          const end = i;
-          const digitBlock = password.slice(start, end);
-
-          if (digitBlock.length >= 4) {
-            const charBeforeIsLetter = start > 0 && /[a-zA-Z]/.test(password[start - 1]);
-            const charAfterIsLetter = end < n && /[a-zA-Z]/.test(password[end]);
-
-            if (!charBeforeIsLetter && !charAfterIsLetter) {
-              for (let j = 0; j <= digitBlock.length - 4; j++) {
-                const subYear = parseInt(digitBlock.slice(j, j + 4), 10);
-                if (subYear >= 1970 && subYear <= 2015) {
-                  hasBirthYear = true;
-                  break;
-                }
-              }
-            }
-          }
-        } else {
-          i++;
-        }
-      }
+      // Birth year check (1950 - 2026)
+      const fourDigits = password.match(/\d{4}/g) || [];
+      const hasBirthYear = fourDigits.some(y => {
+        const val = parseInt(y, 10);
+        return val >= 1950 && val <= 2026;
+      });
 
       if (hasBirthYear) {
-        warnings.push("Potential birth year detected (1970-2015)");
+        warnings.push("Potential birth year detected (1950-2026)");
       }
 
       return warnings;

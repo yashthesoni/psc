@@ -52,35 +52,13 @@ def check_warnings(password: str, pwned_count: int) -> list:
     if not any(not c.isalnum() for c in password):
         warnings.append("No special character")
 
-    # Birth year check (1970 - 2015)
-    n = len(password)
-    i = 0
-    has_birthyear = False
-
-    while i < n:
-        if password[i].isdigit():
-            start = i
-            while i < n and password[i].isdigit():
-                i += 1
-            end = i
-            
-            digit_block = password[start:end]
-            
-            if len(digit_block) >= 4:
-                char_before_is_letter = (start > 0) and password[start - 1].isalpha()
-                char_after_is_letter = (end < n) and password[end].isalpha()
-                
-                if not char_before_is_letter and not char_after_is_letter:
-                    for j in range(len(digit_block) - 3):
-                        sub_year = int(digit_block[j:j+4])
-                        if 1970 <= sub_year <= 2015:
-                            has_birthyear = True
-                            break
-        else:
-            i += 1
+    # Birth year check (1950 - 2026)
+    import re
+    four_digits = re.findall(r'\d{4}', password)
+    has_birthyear = any(1950 <= int(y) <= 2026 for y in four_digits)
 
     if has_birthyear:
-        warnings.append("Potential birth year detected (1970-2015)")
+        warnings.append("Potential birth year detected (1950-2026)")
 
     return warnings
 
