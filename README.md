@@ -16,10 +16,10 @@ If a password triggers any warning, it is **rejected unless the user explicitly 
 | # | Warning Condition | Rationale / Cybersecurity Threat |
 |---|---|---|
 | 1 | **Leaked in 1 to 300 Breaches** | Password has appeared in real-world leaks, but at lower frequency. |
-| 2 | **Fewer than 4 Digits** | Low digit count reduces brute-force resistance. |
+| 2 | **Fewer than 4 Numbers & Special Characters** | Fewer than 4 numbers and special characters combined lowers entropy against dictionary and brute-force attacks. |
 | 3 | **No Uppercase Letter** | Reduces overall character search space (pool size). |
-| 4 | **No Special Character** | Missing non-alphanumeric characters (`@`, `#`, `$`, etc.) lowers complexity. |
-| 5 | **Potential Birth Year (1970–2015)** | Detects 4+ digit blocks containing years between 1970 and 2015 not attached to letters. Prevents predictable personal dates. |
+| 4 | **No Special Character** | At least one non-alphanumeric character (`@`, `#`, `$`, etc.) is mandatory. |
+| 5 | **Potential Birth Year (1950–2026)** | Detects 4-digit blocks containing years between 1950 and 2026. Prevents predictable personal dates. |
 
 ---
 

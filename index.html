@@ -199,15 +199,17 @@
       if (pwnedCount >= 1 && pwnedCount <= 300) {
         warnings.push(`Password leaked in ${pwnedCount} data breaches`);
       }
-      const digitCount = (password.match(/\d/g) || []).length;
-      if (digitCount < 4) {
-        warnings.push(`Fewer than 4 digits (${digitCount} found)`);
-      }
       if (!/[A-Z]/.test(password)) {
         warnings.push("No uppercase letter");
       }
-      if (!/[^a-zA-Z0-9]/.test(password)) {
+      const specialCount = (password.match(/[^a-zA-Z0-9]/g) || []).length;
+      const nonAlphaCount = (password.match(/[^a-zA-Z]/g) || []).length;
+
+      if (specialCount < 1) {
         warnings.push("No special character");
+      }
+      if (nonAlphaCount < 4) {
+        warnings.push(`Fewer than 4 numbers & special characters combined (${nonAlphaCount} found)`);
       }
 
       // Birth year check (1950 - 2026)

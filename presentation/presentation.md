@@ -25,9 +25,9 @@
   - Empty input.
 - **Interactive Warnings (Requires Explicit Approval `y`):**
   - Leaked in 1–300 breaches.
-  - Fewer than 4 numeric digits.
-  - Missing uppercase character or special symbol.
-  - Potential birth year detected (1970–2015).
+  - Fewer than 4 numbers & special characters combined (at least 1 special char mandatory).
+  - Missing uppercase character.
+  - Potential birth year detected (1950–2026).
 
 ---
 

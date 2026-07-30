@@ -39,18 +39,18 @@ def check_warnings(password: str, pwned_count: int) -> list:
     if 1 <= pwned_count <= 300:
         warnings.append(f"Password leaked in {pwned_count} data breaches")
 
-    # Digits count (< 4)
-    digit_count = sum(1 for c in password if c.isdigit())
-    if digit_count < 4:
-        warnings.append(f"Fewer than 4 digits ({digit_count} found)")
-
     # Uppercase check
     if not any(c.isupper() for c in password):
         warnings.append("No uppercase letter")
 
-    # Special character check
-    if not any(not c.isalnum() for c in password):
+    # Numbers + Special characters check (< 4 combined, at least 1 special char mandatory)
+    special_count = sum(1 for c in password if not c.isalnum())
+    non_alpha_count = sum(1 for c in password if not c.isalpha())
+
+    if special_count < 1:
         warnings.append("No special character")
+    if non_alpha_count < 4:
+        warnings.append(f"Fewer than 4 numbers & special characters combined ({non_alpha_count} found)")
 
     # Birth year check (1950 - 2026)
     import re
