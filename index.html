@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Strength Checker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --primary: #38bdf8;
+      --error: #f87171;
+      --warning: #fbbf24;
+      --success: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: #0f172a;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .result-box.status-error {
+      background-color: rgba(248, 113, 113, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+
+    .result-box.status-warning {
+      background-color: rgba(251, 191, 36, 0.1);
+      border: 1px solid var(--warning);
+      color: var(--warning);
+    }
+
+    .result-box.status-success {
+      background-color: rgba(74, 222, 128, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .result-box h4 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .result-box ul {
+      margin-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .result-box li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Password Checker</h2>
+    <p class="subtitle">Check password strength & breach records</p>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter username">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password">
+    </div>
+
+    <button id="check-btn" onclick="checkPassword()">Check Password</button>
+
+    <div id="result" class="result-box"></div>
+  </div>
+
+  <script>
+    async function checkPwnedApi(password) {
+      try {
+        const msgUint8 = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const sha1Hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        
+        const prefix = sha1Hash.slice(0, 5);
+        const suffix = sha1Hash.slice(5);
+
+        const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+        if (!response.ok) return 0;
+        
+        const text = await response.text();
+        const lines = text.split('\n');
+        for (const line of lines) {
+          const [h, count] = line.trim().split(':');
+          if (h === suffix) {
+            return parseInt(count, 10);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      return 0;
+    }
+
+    function checkErrors(username, password, pwnedCount) {
+      const errors = [];
+      if (username.trim() && password.toLowerCase().includes(username.trim().toLowerCase())) {
+        errors.push("Password contains username");
+      }
+      if (pwnedCount > 300) {
+        errors.push(`Password leaked in ${pwnedCount} data breaches`);
+      }
+      return errors;
+    }
+
+    function checkWarnings(password, pwnedCount) {
+      const warnings = [];
+      if (pwnedCount >= 1 && pwnedCount <= 300) {
+        warnings.push(`Password leaked in ${pwnedCount} data breaches`);
+      }
+      const digitCount = (password.match(/\d/g) || []).length;
+      if (digitCount < 4) {
+        warnings.push(`Fewer than 4 digits (${digitCount} found)`);
+      }
+      if (!/[A-Z]/.test(password)) {
+        warnings.push("No uppercase letter");
+      }
+      if (!/[^a-zA-Z0-9]/.test(password)) {
+        warnings.push("No special character");
+      }
+
+      // Birth year check (1970 - 2015)
+      let hasBirthYear = false;
+      const n = password.length;
+      let i = 0;
+
+      while (i < n) {
+        if (/\d/.test(password[i])) {
+          const start = i;
+          while (i < n && /\d/.test(password[i])) {
+            i++;
+          }
+          const end = i;
+          const digitBlock = password.slice(start, end);
+
+          if (digitBlock.length >= 4) {
+            const charBeforeIsLetter = start > 0 && /[a-zA-Z]/.test(password[start - 1]);
+            const charAfterIsLetter = end < n && /[a-zA-Z]/.test(password[end]);
+
+            if (!charBeforeIsLetter && !charAfterIsLetter) {
+              for (let j = 0; j <= digitBlock.length - 4; j++) {
+                const subYear = parseInt(digitBlock.slice(j, j + 4), 10);
+                if (subYear >= 1970 && subYear <= 2015) {
+                  hasBirthYear = true;
+                  break;
+                }
+              }
+            }
+          }
+        } else {
+          i++;
+        }
+      }
+
+      if (hasBirthYear) {
+        warnings.push("Potential birth year detected (1970-2015)");
+      }
+
+      return warnings;
+    }
+
+    async function checkPassword() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('check-btn');
+      const resultDiv = document.getElementById('result');
+
+      if (!password) {
+        resultDiv.className = 'result-box status-error';
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<h4>Password rejected</h4><p>Password cannot be empty.</p>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Checking...';
+      resultDiv.style.display = 'none';
+
+      const pwnedCount = await checkPwnedApi(password);
+      const errors = checkErrors(username, password, pwnedCount);
+      const warnings = checkWarnings(password, pwnedCount);
+
+      btn.disabled = false;
+      btn.innerText = 'Check Password';
+
+      if (errors.length > 0) {
+        resultDiv.className = 'result-box status-error';
+        let html = '<h4>Password rejected</h4><ul>';
+        errors.forEach(err => html += `<li>${err}</li>`);
+        html += '</ul>';
+        resultDiv.innerHTML = html;
+      } else if (warnings.length > 0) {
+        resultDiv.className = 'result-box status-warning';
+        let html = '<h4>Warnings detected</h4><ul>';
+        warnings.forEach(w => html += `<li>${w}</li>`);
+        html += '</ul><p>Password acceptable with warnings.</p>';
+        resultDiv.innerHTML = html;
+      } else {
+        resultDiv.className = 'result-box status-success';
+        resultDiv.innerHTML = '<h4>Password accepted!</h4><p>No errors or warnings found.</p>';
+      }
+
+      resultDiv.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
